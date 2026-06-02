@@ -42,17 +42,12 @@
       "use": "@vercel/static"
     },
     {
-      "src": "api/**/*.mjs",
-      "use": "@vercel/node"
-    },
-    {
       "src": "server.mjs",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/proxy/(.*)", "dest": "/api/proxy/$1" },
     { "src": "/s=(.*)", "dest": "/server.mjs" },
     { "src": "/player.html", "dest": "/server.mjs" },
     { "src": "/(.*)", "dest": "/server.mjs" }

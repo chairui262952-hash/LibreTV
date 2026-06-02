@@ -152,9 +152,134 @@ function validateProxyAuth(req) {
   return true;
 }
 
-app.get('/proxy/:encodedUrl', async (req, res) => {
+// 检查内容是否是 M3U8
+function isM3u8Content(content, contentType) {
+  if (contentType && (contentType.includes('application/vnd.apple.mpegurl') || contentType.includes('application/x-mpegurl') || contentType.includes('audio/mpegurl'))) {
+    return true;
+  }
+  return content && typeof content === 'string' && content.trim().startsWith('#EXTM3U');
+}
+
+// 从 URL 中提取基础路径
+function getBasePath(urlStr) {
   try {
-    // 验证鉴权
+    const u = new URL(urlStr);
+    const segs = u.pathname.split('/').filter(Boolean);
+    if (segs.length <= 1) return u.origin + '/';
+    segs.pop();
+    return u.origin + '/' + segs.join('/') + '/';
+  } catch {
+    const i = urlStr.lastIndexOf('/');
+    return i > urlStr.indexOf('://') + 2 ? urlStr.substring(0, i + 1) : urlStr + '/';
+  }
+}
+
+// 拼接相对 URL
+function resolveRelativeUrl(base, relative) {
+  if (!relative) return '';
+  if (relative.match(/^https?:\/\//i)) return relative;
+  if (!base) return relative;
+  try {
+    return new URL(relative, base).toString();
+  } catch {
+    if (relative.startsWith('/')) {
+      try { return new URL(base).origin + relative; } catch { return relative; }
+    }
+    return base.substring(0, base.lastIndexOf('/') + 1) + relative;
+  }
+}
+
+// 处理 M3U8 媒体播放列表：把所有片段 URL 重写为代理 URL
+function processMediaPlaylist(url, content) {
+  const baseUrl = getBasePath(url);
+  const lines = content.split('\n');
+  const result = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (!trimmed && i === lines.length - 1) { result.push(line); continue; }
+    if (!trimmed) continue;
+    if (trimmed.startsWith('#EXT-X-KEY')) {
+      result.push(trimmed.replace(/URI="([^"]+)"/, (_, uri) =>
+        `URI="/proxy/${encodeURIComponent(resolveRelativeUrl(baseUrl, uri))}"`));
+      continue;
+    }
+    if (trimmed.startsWith('#EXT-X-MAP')) {
+      result.push(trimmed.replace(/URI="([^"]+)"/, (_, uri) =>
+        `URI="/proxy/${encodeURIComponent(resolveRelativeUrl(baseUrl, uri))}"`));
+      continue;
+    }
+    if (trimmed.startsWith('#EXTINF')) { result.push(line); continue; }
+    if (!trimmed.startsWith('#')) {
+      const absUrl = resolveRelativeUrl(baseUrl, trimmed);
+      result.push(`/proxy/${encodeURIComponent(absUrl)}`);
+      continue;
+    }
+    result.push(line);
+  }
+  return result.join('\n');
+}
+
+// 处理 M3U8 主播放列表：选取最高带宽的子列表并递归处理
+async function processMasterPlaylist(url, content, depth) {
+  if (depth > 5) throw new Error('M3U8 递归深度超限');
+  const baseUrl = getBasePath(url);
+  const lines = content.split('\n');
+  let bestBandwidth = -1;
+  let bestUrl = '';
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith('#EXT-X-STREAM-INF')) {
+      const bw = (lines[i].match(/BANDWIDTH=(\d+)/) || [])[1];
+      const currentBw = bw ? parseInt(bw, 10) : 0;
+      for (let j = i + 1; j < lines.length; j++) {
+        const tl = lines[j].trim();
+        if (tl && !tl.startsWith('#')) {
+          if (currentBw >= bestBandwidth) {
+            bestBandwidth = currentBw;
+            bestUrl = resolveRelativeUrl(baseUrl, tl);
+          }
+          i = j;
+          break;
+        }
+      }
+    }
+  }
+  if (!bestUrl) {
+    // 没找到带宽信息，取第一个 .m3u8 链接
+    for (const line of lines) {
+      const tl = line.trim();
+      if (tl && !tl.startsWith('#') && /\.m3u8($|\?)/i.test(tl)) {
+        bestUrl = resolveRelativeUrl(baseUrl, tl);
+        break;
+      }
+    }
+  }
+  if (!bestUrl) return processMediaPlaylist(url, content);
+  const resp = await axios.get(bestUrl, {
+    responseType: 'text',
+    timeout: config.timeout,
+    headers: { 'User-Agent': config.userAgent }
+  });
+  const subContent = resp.data;
+  const subType = resp.headers['content-type'] || '';
+  if (!isM3u8Content(subContent, subType)) return processMediaPlaylist(bestUrl, subContent);
+  if (subContent.includes('#EXT-X-STREAM-INF')) {
+    return processMasterPlaylist(bestUrl, subContent, depth + 1);
+  }
+  return processMediaPlaylist(bestUrl, subContent);
+}
+
+// 处理 M3U8 内容入口
+async function processM3u8Content(url, content) {
+  if (content.includes('#EXT-X-STREAM-INF')) {
+    return processMasterPlaylist(url, content, 0);
+  }
+  return processMediaPlaylist(url, content);
+}
+
+// 代理路由 —— 使用正则匹配，从 req.url 获取原始未解码的 URL
+app.get(/^\/proxy\/(.+)/, async (req, res) => {
+  try {
     if (!validateProxyAuth(req)) {
       return res.status(401).json({
         success: false,
@@ -162,17 +287,20 @@ app.get('/proxy/:encodedUrl', async (req, res) => {
       });
     }
 
-    const encodedUrl = req.params.encodedUrl;
+    // 从原始 req.url 提取编码后的目标 URL（避免 Express 解码 %2F）
+    const rawPath = req.url.split('?')[0];
+    const encodedUrl = rawPath.replace(/^\/proxy\//, '');
+    if (!encodedUrl) {
+      return res.status(400).send('缺少目标 URL');
+    }
     const targetUrl = decodeURIComponent(encodedUrl);
 
-    // 安全验证
     if (!isValidUrl(targetUrl)) {
       return res.status(400).send('无效的 URL');
     }
 
     log(`代理请求: ${targetUrl}`);
 
-    // 添加请求超时和重试逻辑
     const maxRetries = config.maxRetries;
     let retries = 0;
     
@@ -181,11 +309,10 @@ app.get('/proxy/:encodedUrl', async (req, res) => {
         return await axios({
           method: 'get',
           url: targetUrl,
-          responseType: 'stream',
+          responseType: 'text',  // 先当文本取，方便判断 M3U8
           timeout: config.timeout,
-          headers: {
-            'User-Agent': config.userAgent
-          }
+          headers: { 'User-Agent': config.userAgent },
+          transformResponse: [(data) => data]  // 不要自动 JSON 解析
         });
       } catch (error) {
         if (retries < maxRetries) {
@@ -198,26 +325,34 @@ app.get('/proxy/:encodedUrl', async (req, res) => {
     };
 
     const response = await makeRequest();
+    const content = response.data;
+    const contentType = response.headers['content-type'] || '';
 
-    // 转发响应头（过滤敏感头）
+    // 如果是 M3U8，处理后再返回
+    if (isM3u8Content(content, contentType)) {
+      log(`检测到 M3U8 内容，开始处理: ${targetUrl}`);
+      const processed = await processM3u8Content(targetUrl, content);
+      res.setHeader('Content-Type', 'application/vnd.apple.mpegurl;charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      return res.send(processed);
+    }
+
+    // 非 M3U8：转发明文响应
     const headers = { ...response.headers };
     const sensitiveHeaders = (
       process.env.FILTERED_HEADERS || 
       'content-security-policy,cookie,set-cookie,x-frame-options,access-control-allow-origin'
     ).split(',');
-    
-    sensitiveHeaders.forEach(header => delete headers[header]);
+    sensitiveHeaders.forEach(h => delete headers[h]);
     res.set(headers);
-
-    // 管道传输响应流
-    response.data.pipe(res);
+    res.send(content);
   } catch (error) {
     console.error('代理请求错误:', error.message);
     if (error.response) {
-      res.status(error.response.status || 500);
-      error.response.data.pipe(res);
+      res.status(error.response.status || 502);
+      res.send(error.response.data || '上游服务器错误');
     } else {
-      res.status(500).send(`请求失败: ${error.message}`);
+      res.status(502).send(`请求失败: ${error.message}`);
     }
   }
 });
