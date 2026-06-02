@@ -34,6 +34,18 @@
       "use": "@vercel/static"
     },
     {
+      "src": "watch.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "VERSION.txt",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "api/proxy/[...path].mjs",
+      "use": "@vercel/node"
+    },
+    {
       "src": "server.mjs",
       "use": "@vercel/node"
     }
