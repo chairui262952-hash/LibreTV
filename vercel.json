@@ -42,7 +42,7 @@
       "use": "@vercel/static"
     },
     {
-      "src": "api/proxy/[...path].mjs",
+      "src": "api/**/*.mjs",
       "use": "@vercel/node"
     },
     {
