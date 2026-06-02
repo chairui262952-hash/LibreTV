@@ -2,29 +2,47 @@
   "version": 2,
   "builds": [
     {
+      "src": "css/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "libs/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "image/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "manifest.json",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "service-worker.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "robots.txt",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "about.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "server.mjs",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": "css/**/*,js/**/*,libs/**/*,image/**/*,*.html,*.json,*.txt,*.xml,*.ico"
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
-    {
-      "src": "/proxy/(.*)",
-      "dest": "/api/proxy/$1"
-    },
-    {
-      "src": "/s=(.*)",
-      "dest": "/server.mjs"
-    },
-    {
-      "src": "/player.html",
-      "dest": "/server.mjs"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/server.mjs"
-    }
+    { "handle": "filesystem" },
+    { "src": "/proxy/(.*)", "dest": "/api/proxy/$1" },
+    { "src": "/s=(.*)", "dest": "/server.mjs" },
+    { "src": "/player.html", "dest": "/server.mjs" },
+    { "src": "/(.*)", "dest": "/server.mjs" }
   ]
 }
