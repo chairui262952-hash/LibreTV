@@ -1,24 +1,27 @@
 {
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/proxy/:path*",
-      "destination": "/api/proxy/:path*"
+      "src": "server.mjs",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/proxy/(.*)",
+      "dest": "/api/proxy/$1"
     },
     {
-      "source": "/s=:query",
-      "destination": "/index.html"
+      "src": "/s=(.*)",
+      "dest": "/server.mjs"
     },
     {
-      "source": "/player.html",
-      "destination": "/player.html"
+      "src": "/player.html",
+      "dest": "/server.mjs"
     },
     {
-      "source": "/player.html/:path*",
-      "destination": "/player.html"
-    },
-    {
-      "source": "/:path*",
-      "destination": "/:path*"
+      "src": "/(.*)",
+      "dest": "/server.mjs"
     }
   ]
 }
