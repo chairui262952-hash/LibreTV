@@ -20,14 +20,9 @@ const SITE_CONFIG = {
     version: '1.0.3'
 };
 
-// API站点配置
+// API站点配置（内置源 + 自定义源由 customer_site.js 合并）
 const API_SITES = {
-    testSource: {
-        api: 'https://www.example.com/api.php/provide/vod',
-        name: '空内容测试源',
-        adult: true
-    }
-    //ARCHIVE https://telegra.ph/APIs-08-12
+    // 更多源在 js/customer_site.js 中定义，通过 extendAPISites 合并进来
 };
 
 // 定义合并方法
