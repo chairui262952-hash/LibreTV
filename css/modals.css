@@ -263,3 +263,17 @@
     border-radius: 4px;
     padding: 2px 4px;
 }
+
+/* 源切换标签 */
+.source-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.source-tabs::-webkit-scrollbar {
+    display: none;
+}
+.source-tabs button {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
