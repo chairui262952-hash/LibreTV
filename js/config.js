@@ -13,9 +13,9 @@ const PASSWORD_CONFIG = {
 
 // 网站信息配置
 const SITE_CONFIG = {
-    name: 'LibreTV',
+    name: '小笨电视',
     url: 'https://libretv.is-an.org',
-    description: '免费在线视频搜索与观看平台',
+    description: '布布和一二陪你一起追剧 ✨',
     logo: 'image/logo.png',
     version: '1.0.3'
 };
