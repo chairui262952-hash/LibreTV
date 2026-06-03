@@ -132,16 +132,13 @@ function addVersionInfoToFooter() {
         const versionElement = document.createElement('p');
         versionElement.className = 'text-gray-500 text-sm mt-1 text-center md:text-left';
         
-        // 添加当前版本信息
-        versionElement.innerHTML = `版本: ${result.currentFormatted}`;
+        // 显示版本号，不显示日期
+        versionElement.innerHTML = `v${result.current}`;
         
         // 如果有更新，添加更新提示
         if (result.hasUpdate) {
-            versionElement.innerHTML += ` <span class="inline-flex items-center bg-red-600 text-white text-xs px-2 py-0.5 rounded-md ml-1 cursor-pointer animate-pulse font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                发现新版
+            versionElement.innerHTML += ` <span class="inline-flex items-center bg-[#F4D8D8] text-[#5F5449] text-xs px-2 py-0.5 rounded-full ml-1 cursor-pointer font-medium" style="animation:pulse 2s ease-in-out infinite;">
+                发现新版 v${result.latest}
             </span>`;
             
             setTimeout(() => {
@@ -153,8 +150,8 @@ function addVersionInfoToFooter() {
                 }
             }, 100);
         } else {
-            // 如果没有更新，显示当前版本为最新版本
-            versionElement.innerHTML = `版本: ${result.currentFormatted} <span class="text-green-500">(最新版本)</span>`;
+            // 最新版本
+            versionElement.innerHTML = `v${result.current} <span class="text-xs text-[#9B8E82]">· 已是最新</span>`;
         }
         
         // 显示版本元素
