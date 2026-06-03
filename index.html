@@ -18,6 +18,14 @@
     <link rel="stylesheet" href="css/index.css">
 </head>
 <body class="page-bg">
+    <!-- 左侧装饰图 -->
+    <div class="fixed left-4 top-1/3 z-10 pointer-events-none select-none hidden lg:block opacity-60" style="width:90px;height:90px;">
+        <img src="image/素材图2.jpg" alt="" class="w-full h-full object-contain rounded-2xl shadow-lg" style="transform:rotate(-6deg);">
+    </div>
+    <!-- 右侧装饰图 -->
+    <div class="fixed right-4 top-1/2 z-10 pointer-events-none select-none hidden lg:block opacity-60" style="width:80px;height:80px;">
+        <img src="image/素材图3.jpg" alt="" class="w-full h-full object-contain rounded-2xl shadow-lg" style="transform:rotate(8deg);">
+    </div>
     <!-- 小笨吉祥物 —— 右下角 -->
     <div class="fixed bottom-6 right-6 z-20 pointer-events-none select-none opacity-80 hover:opacity-100 transition-opacity duration-500" style="width:120px;height:120px;">
         <img src="image/素材图8.gif" alt="小笨吉祥物" class="w-full h-full object-contain drop-shadow-lg" style="filter:drop-shadow(0 4px 12px rgba(180,160,140,0.3));">
@@ -191,9 +199,7 @@
             <header class="text-center mb-2">
                 <div class="flex justify-center items-center mb-4">
                     <a href="#" onclick="resetToHome(); return false;" class="flex items-center">
-                        <svg class="w-10 h-10 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
+                        <img src="image/logo 小笨电视.png" alt="小笨电视" class="w-12 h-12 mr-3 object-contain rounded-xl">
                         <h1 class="text-5xl font-bold gradient-text">小笨电视</h1>
                     </a>
                 </div>
@@ -294,14 +300,12 @@
     </div>
 
     <!-- 页脚区域 -->
-    <footer class="footer mt-8 py-6 border-t border-[#E6C5A3]/30 bg-[#0a0a0a]">
+    <footer class="footer mt-8 py-6 border-t border-[#E6C5A3]/30 bg-white/70">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
                     <div class="flex items-center justify-center md:justify-start">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
+                        <img src="image/logo 小笨电视.png" alt="小笨电视" class="w-7 h-7 mr-2 object-contain rounded-lg">
                         <span class="gradient-text font-bold">小笨电视</span>
                     </div>
                     <p class="text-gray-500 text-sm mt-2 text-center md:text-left">♡ 给世界上最可爱的观众 — 小笨电视</p>
