@@ -35,9 +35,17 @@
     <div class="fixed right-5 top-1/2 z-10 pointer-events-none select-none hidden lg:block opacity-50" style="width:75px;height:75px;">
         <img src="image/素材图6.jpg" alt="" class="w-full h-full object-contain rounded-2xl shadow-lg" style="transform:rotate(4deg);">
     </div>
-    <!-- 小笨吉祥物 —— 右下角 -->
-    <div class="fixed bottom-6 right-6 z-20 pointer-events-none select-none opacity-80 hover:opacity-100 transition-opacity duration-500" style="width:120px;height:120px;">
-        <img src="image/素材图8.gif" alt="小笨吉祥物" class="w-full h-full object-contain drop-shadow-lg" style="filter:drop-shadow(0 4px 12px rgba(180,160,140,0.3));">
+    <!-- 小笨吉祥物 —— 可拖动宠物 -->
+    <div id="mascot" class="fixed z-20 select-none cursor-grab active:cursor-grabbing" 
+         style="right:24px;bottom:24px;width:120px;height:120px;opacity:0.85;transition:opacity 0.3s;"
+         onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.85'">
+        <img src="image/素材图8.gif" alt="小笨吉祥物" draggable="false"
+             class="w-full h-full object-contain drop-shadow-lg" 
+             style="filter:drop-shadow(0 4px 12px rgba(180,160,140,0.3));pointer-events:none;">
+        <!-- 小气泡 -->
+        <div id="mascotBubble" class="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-[#5F5449] text-xs px-2 py-1 rounded-2xl shadow-md whitespace-nowrap opacity-0 transition-opacity duration-300" style="pointer-events:none;">
+            🐻 嗷呜～
+        </div>
     </div>
     
     <!-- 将历史记录按钮移到左上角，并缩小尺寸 -->
@@ -495,13 +503,57 @@
         const slogan = document.querySelector('header p.text-gray-400');
         if (slogan) slogan.textContent = g;
 
-        // ===== 3. 点击吉祥物 → 爱心雨 =====
+        // ===== 3. 拖拽吉祥物宠物 =====
+        const mascotEl = document.getElementById('mascot');
+        const bubble = document.getElementById('mascotBubble');
+        let isDragging = false, startX, startY, startRight, startBottom;
+        const bubbleMsgs = ['🐻 嗷呜～','💕 抱抱','✨ 嘻嘻','🌸 好开心','🧸 别拽我','🍰 晕了晕了','💫 飞起来了'];
+        
+        if (mascotEl) {
+            mascotEl.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startX = e.clientX; startY = e.clientY;
+                startRight = parseInt(mascotEl.style.right) || 24;
+                startBottom = parseInt(mascotEl.style.bottom) || 24;
+                mascotEl.style.transition = 'none';
+                bubble.textContent = bubbleMsgs[Math.floor(Math.random()*bubbleMsgs.length)];
+                bubble.style.opacity = '1';
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                const dx = startX - e.clientX, dy = startY - e.clientY;
+                mascotEl.style.right = Math.max(-20, Math.min(window.innerWidth-100, startRight+dx)) + 'px';
+                mascotEl.style.bottom = Math.max(-20, Math.min(window.innerHeight-100, startBottom+dy)) + 'px';
+            });
+            document.addEventListener('mouseup', function() {
+                if (isDragging) { isDragging = false; mascotEl.style.transition = 'opacity 0.3s'; setTimeout(() => bubble.style.opacity='0', 800); }
+            });
+            // 触摸
+            mascotEl.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+                startRight = parseInt(mascotEl.style.right) || 24;
+                startBottom = parseInt(mascotEl.style.bottom) || 24;
+                mascotEl.style.transition = 'none';
+                bubble.textContent = bubbleMsgs[Math.floor(Math.random()*bubbleMsgs.length)];
+                bubble.style.opacity = '1';
+            }, {passive:false});
+            document.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                const dx = startX - e.touches[0].clientX, dy = startY - e.touches[0].clientY;
+                mascotEl.style.right = Math.max(-20, Math.min(window.innerWidth-100, startRight+dx)) + 'px';
+                mascotEl.style.bottom = Math.max(-20, Math.min(window.innerHeight-100, startBottom+dy)) + 'px';
+            }, {passive:false});
+            document.addEventListener('touchend', function() {
+                if (isDragging) { isDragging = false; mascotEl.style.transition = 'opacity 0.3s'; setTimeout(() => bubble.style.opacity='0', 800); }
+            });
+        }
+
+        // ===== 4. 点击吉祥物 → 爱心雨 =====
         let heartCount = 0;
-        const mascot = document.querySelector('.fixed.bottom-6.right-6 img');
-        if (mascot) {
-            mascot.parentElement.classList.remove('pointer-events-none');
-            mascot.parentElement.style.cursor = 'pointer';
-            mascot.parentElement.addEventListener('click', function(e) {
+        if (mascotEl) {
+            mascotEl.addEventListener('click', function(e) {
                 heartCount++;
                 const msgs = [
                     '♡ 布布爱你！', '🧸 抱抱～', '✨ 一二也爱你', '💕 叮咚！', 
