@@ -27,16 +27,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 设置默认API选择（如果是第一次加载）
     if (!localStorage.getItem('hasInitializedDefaults')) {
-        // 默认选中资源
-        selectedAPIs = ["tyyszy", "bfzy", "dyttzy", "ruyi"];
+        // 默认全选所有非成人API源
+        selectedAPIs = Object.keys(API_SITES).filter(k => !API_SITES[k].adult);
         localStorage.setItem('selectedAPIs', JSON.stringify(selectedAPIs));
 
         // 默认选中过滤开关
         localStorage.setItem('yellowFilterEnabled', 'true');
         localStorage.setItem(PLAYER_CONFIG.adFilteringStorage, 'true');
 
-        // 默认启用豆瓣功能
-        localStorage.setItem('doubanEnabled', 'true');
+        // 默认关闭豆瓣功能
+        localStorage.setItem('doubanEnabled', 'false');
 
         // 标记已初始化默认值
         localStorage.setItem('hasInitializedDefaults', 'true');
