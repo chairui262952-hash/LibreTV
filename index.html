@@ -458,5 +458,130 @@
 
     <!-- 添加弹窗和URL搜索参数处理脚本 -->
     <script src="js/index-page.js"></script>
+
+    <!-- 🎀 彩蛋系统 -->
+    <script>
+    (function() {
+        // ===== 1. 随机页脚文案 =====
+        const footerMsgs = [
+            '♡ 给世界上最可爱的观众',
+            '🐻 布布今天也在想你',
+            '✨ 一二说：追剧要开心哦',
+            '🧸 你是布布最喜欢的人类',
+            '🌸 今天的你也很可爱',
+            '☁️ 躺在布布肚子上看剧吧',
+            '🍰 一二给你留了块蛋糕',
+            '💫 晚安～不对，先追完这一集'
+        ];
+        const msg = footerMsgs[Math.floor(Math.random() * footerMsgs.length)];
+        const footerP = document.querySelector('footer p.text-gray-500');
+        if (footerP) footerP.textContent = msg;
+
+        // ===== 2. 时钟问候语 =====
+        const hour = new Date().getHours();
+        const greetings = {
+            morning: ['☀️ 早上好呀～布布刚醒', '🌤️ 今天也要元气满满', '🥐 一二准备了早餐'],
+            afternoon: ['🌸 下午好～困了靠布布睡会', '🍵 一二泡了奶茶给你', '☁️ 慵懒的午后追剧时光'],
+            evening: ['🌙 晚上想看点什么呢？', '✨ 布布和一二陪你', '🕯️ 点亮一盏小夜灯'],
+            night: ['🌟 夜深了，一二在等你', '💤 布布说今晚最后亿集', '🌙 晚安～窝在被窝里看']
+        };
+        let timeGreet;
+        if (hour < 7) timeGreet = greetings.night;
+        else if (hour < 12) timeGreet = greetings.morning;
+        else if (hour < 18) timeGreet = greetings.afternoon;
+        else if (hour < 22) timeGreet = greetings.evening;
+        else timeGreet = greetings.night;
+        const g = timeGreet[Math.floor(Math.random() * timeGreet.length)];
+        const slogan = document.querySelector('header p.text-gray-400');
+        if (slogan) slogan.textContent = g;
+
+        // ===== 3. 点击吉祥物 → 爱心雨 =====
+        let heartCount = 0;
+        const mascot = document.querySelector('.fixed.bottom-6.right-6 img');
+        if (mascot) {
+            mascot.parentElement.classList.remove('pointer-events-none');
+            mascot.parentElement.style.cursor = 'pointer';
+            mascot.parentElement.addEventListener('click', function(e) {
+                heartCount++;
+                const msgs = [
+                    '♡ 布布爱你！', '🧸 抱抱～', '✨ 一二也爱你', '💕 叮咚！', 
+                    '🌸 今天真好看', '🍰 给你小心心', '🐻 嗷呜～', '💫 啾咪！'
+                ];
+                // 显示消息
+                const toast = document.getElementById('toast');
+                const toastMsg = document.getElementById('toastMessage');
+                if (toast && toastMsg) {
+                    toastMsg.textContent = msgs[heartCount % msgs.length];
+                    toast.classList.remove('hidden');
+                    toast.style.opacity = '1';
+                    setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+                }
+                // 爱心雨
+                for (let i = 0; i < 8; i++) {
+                    const heart = document.createElement('span');
+                    heart.textContent = ['❤️','💕','💖','💗','🩷','🧸','✨','🌸'][i];
+                    heart.style.cssText = `
+                        position:fixed; z-index:9999; pointer-events:none;
+                        font-size:${16+Math.random()*20}px;
+                        left:${e.clientX-15+Math.random()*30}px;
+                        top:${e.clientY}px;
+                        animation: heartFall ${1+Math.random()*1.5}s ease-out forwards;
+                    `;
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 2500);
+                }
+                // 第10次点击彩蛋
+                if (heartCount === 10) {
+                    setTimeout(() => {
+                        if (toast && toastMsg) {
+                            toastMsg.textContent = '🐻💕 布布和一二永远在一起！';
+                            toast.classList.remove('hidden');
+                            toast.style.opacity = '1';
+                            setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+                        }
+                    }, 500);
+                }
+            });
+        }
+
+        // ===== 4. 三击 Logo → 隐藏彩蛋 =====
+        let logoClicks = 0;
+        let logoTimeout;
+        const logoImg = document.querySelector('header img[alt="小笨电视"]');
+        if (logoImg) {
+            logoImg.style.cursor = 'pointer';
+            logoImg.addEventListener('click', function() {
+                logoClicks++;
+                clearTimeout(logoTimeout);
+                logoTimeout = setTimeout(() => { logoClicks = 0; }, 800);
+                if (logoClicks >= 3) {
+                    logoClicks = 0;
+                    const heart = document.createElement('div');
+                    heart.innerHTML = '🐻💕一二';
+                    heart.style.cssText = `
+                        position:fixed; top:50%; left:50%; z-index:99999;
+                        transform:translate(-50%,-50%) scale(0);
+                        font-size:60px; pointer-events:none;
+                        animation: logoBoom 2s ease-out forwards;
+                    `;
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 2500);
+                }
+            });
+        }
+    })();
+    </script>
+
+    <style>
+    @keyframes heartFall {
+        0% { opacity:1; transform:translateY(0) rotate(0deg) scale(1); }
+        100% { opacity:0; transform:translateY(-120px) rotate(30deg) scale(0.3); }
+    }
+    @keyframes logoBoom {
+        0% { transform:translate(-50%,-50%) scale(0) rotate(0deg); opacity:1; }
+        50% { transform:translate(-50%,-50%) scale(2) rotate(180deg); opacity:0.8; }
+        100% { transform:translate(-50%,-50%) scale(3) rotate(360deg); opacity:0; }
+    }
+    </style>
 </body>
 </html>
