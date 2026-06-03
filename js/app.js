@@ -688,13 +688,10 @@ async function search() {
         // 如果没有结果
         if (!allResults || allResults.length === 0) {
             resultsDiv.innerHTML = `
-                <div class="col-span-full text-center py-16">
-                    <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <h3 class="mt-2 text-lg font-medium text-gray-400">没有找到匹配的结果</h3>
-                    <p class="mt-1 text-sm text-gray-500">请尝试其他关键词或更换数据源</p>
+                <div class="col-span-full text-center py-12">
+                    <img src="image/素材图5.jpg" alt="布布说没找到" class="mx-auto w-28 h-28 object-contain rounded-2xl mb-4 opacity-80">
+                    <h3 class="text-lg font-medium text-[#5F5449]">布布什么也没找到...</h3>
+                    <p class="mt-1 text-sm text-[#9B8E82]">换个关键词试试？或者勾选更多数据源 ✨</p>
                 </div>
             `;
             hideLoading();

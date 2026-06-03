@@ -9,8 +9,8 @@
     <meta name="author" content="小笨电视">
 
     <!-- Favicon -->
-    <link rel="icon" href="image/logo.png">
-    <link rel="apple-touch-icon" href="image/logo-black.png">
+    <link rel="icon" href="image/logo 小笨电视.png">
+    <link rel="apple-touch-icon" href="image/logo 小笨电视.png">
     <link rel="manifest" href="manifest.json">
     
     <script src="libs/tailwindcss.min.js"></script>
@@ -18,6 +18,11 @@
     <link rel="stylesheet" href="css/index.css">
 </head>
 <body class="page-bg">
+    <!-- 小笨吉祥物 —— 右下角 -->
+    <div class="fixed bottom-6 right-6 z-20 pointer-events-none select-none opacity-80 hover:opacity-100 transition-opacity duration-500" style="width:120px;height:120px;">
+        <img src="image/素材图8.gif" alt="小笨吉祥物" class="w-full h-full object-contain drop-shadow-lg" style="filter:drop-shadow(0 4px 12px rgba(180,160,140,0.3));">
+    </div>
+    
     <!-- 将历史记录按钮移到左上角，并缩小尺寸 -->
     <div class="fixed top-4 left-4 z-10">
         <button onclick="toggleHistory(event)" class="bg-[#FFF9F5] hover:bg-[#E6C5A3] border border-[#E6C5A3]/30 hover:border-white rounded-lg px-3 py-1.5 transition-colors" aria-label="观看历史">
@@ -382,11 +387,11 @@
         <p id="toastMessage"></p>
     </div>
 
-    <!-- 添加 loading 提示框 -->
-    <div id="loading" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-lg border border-[#E6C5A3]/30 flex items-center space-x-4">
-            <div class="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-            <p class="text-white text-lg">加载中...</p>
+    <!-- 加载动画 —— 吉祥物动图 -->
+    <div id="loading" class="fixed inset-0 bg-[#FAF7F2]/90 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="text-center">
+            <img src="image/素材图8.gif" alt="加载中..." class="w-24 h-24 mx-auto mb-4 object-contain rounded-2xl shadow-lg">
+            <p class="text-[#5F5449] text-lg font-medium">布布在帮你找片中...</p>
         </div>
     </div>
 
