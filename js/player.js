@@ -261,21 +261,22 @@ function initializePageContent() {
         }
     });
 
-    // 视频暂停时也保存
+    // 视频暂停时也保存（最多等10秒）
+    let pollCount = 0;
     const waitForVideo = setInterval(() => {
+        pollCount++;
         if (art && art.video) {
             art.video.addEventListener('pause', saveCurrentProgress);
-
-            // 新增：播放进度变化时节流保存
             let lastSave = 0;
             art.video.addEventListener('timeupdate', function() {
                 const now = Date.now();
-                if (now - lastSave > 5000) { // 每5秒最多保存一次
+                if (now - lastSave > 5000) {
                     saveCurrentProgress();
                     lastSave = now;
                 }
             });
-
+            clearInterval(waitForVideo);
+        } else if (pollCount > 50) { // 10秒超时
             clearInterval(waitForVideo);
         }
     }, 200);
@@ -1224,6 +1225,11 @@ function startProgressSaveInterval() {
     // 每30秒保存一次播放进度
     progressSaveInterval = setInterval(saveCurrentProgress, 30000);
 }
+
+// 页面卸载时清理
+window.addEventListener('beforeunload', function() {
+    if (progressSaveInterval) clearInterval(progressSaveInterval);
+});
 
 // 保存当前播放进度
 function saveCurrentProgress() {

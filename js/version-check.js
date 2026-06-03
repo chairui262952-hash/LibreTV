@@ -28,6 +28,12 @@ async function fetchVersion(url, errorMessage, options = {}) {
 
 // 版本检查函数
 async function checkForUpdates() {
+    // 使用 sessionStorage 缓存，避免每次页面加载都请求
+    const cacheKey = 'versionCheckCache';
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+        try { return JSON.parse(cached); } catch(e) {}
+    }
     try {
         // 获取当前版本
         const currentVersion = await fetchVersion('/VERSION.txt', '获取当前版本失败', {
@@ -71,13 +77,15 @@ async function checkForUpdates() {
         const cleanLatestVersion = latestVersion.trim();
         
         // 返回版本信息
-        return {
+        const result = {
             current: cleanCurrentVersion,
             latest: cleanLatestVersion,
             hasUpdate: parseInt(cleanLatestVersion) > parseInt(cleanCurrentVersion),
             currentFormatted: formatVersion(cleanCurrentVersion),
             latestFormatted: formatVersion(cleanLatestVersion)
         };
+        sessionStorage.setItem(cacheKey, JSON.stringify(result));
+        return result;
     } catch (error) {
         console.error('版本检测出错:', error);
         throw error;
