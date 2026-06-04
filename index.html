@@ -218,25 +218,32 @@
         </div>
     </div>
 
-    <!-- 留言板面板 -->
-    <div id="msgBoardPanel" class="settings-panel fixed right-0 top-0 h-full w-80 bg-white border-l border-[#E6C5A3]/30 p-5 z-40 flex flex-col" aria-label="留言板" aria-hidden="true">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-bold gradient-text">💌 小纸条</h3>
-            <button onclick="toggleMsgBoard()" class="close-btn" style="position:static;">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
+    <!-- 💌 留言板面板 -->
+    <div id="msgBoardPanel" class="settings-panel fixed right-0 top-0 h-full w-80 z-40 flex flex-col" aria-label="留言板" aria-hidden="true" style="background:linear-gradient(180deg,rgba(255,248,240,0.95),rgba(255,245,235,0.95));border-left:2px solid rgba(230,197,163,0.4);">
+        <!-- 背景图 -->
+        <div style="position:absolute;inset:0;pointer-events:none;background:url('image/留言板背景图.jpg') center/cover no-repeat;opacity:0.12;border-radius:0;"></div>
+        
+        <!-- 标题栏 -->
+        <div class="relative flex justify-between items-center px-4 py-3" style="border-bottom:1px solid rgba(230,197,163,0.25);">
+            <div class="flex items-center gap-2">
+                <span style="font-size:1.3rem;">💌</span>
+                <h3 class="font-bold" style="background:linear-gradient(135deg,#D7C5B0,#E6C5A3,#F4D8D8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:1rem;">小纸条</h3>
+            </div>
+            <button onclick="toggleMsgBoard()" style="background:none;border:none;color:#C4B8AC;font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:50%;transition:all 0.2s;">✕</button>
         </div>
+        
         <!-- 消息列表 -->
-        <div id="msgList" class="flex-1 overflow-y-auto mb-3 pr-1 space-y-1" style="scrollbar-width:thin;scrollbar-color:#E6C5A3 #FFF;">
-            <div id="msgBoardLoading" class="text-center text-[#9B8E82] text-sm py-8">加载中...</div>
+        <div id="msgList" class="relative flex-1 overflow-y-auto px-3 py-2" style="scrollbar-width:thin;scrollbar-color:rgba(230,197,163,0.4) transparent;display:flex;flex-direction:column;">
+            <div id="msgBoardLoading" class="text-center text-[#9B8E82] text-xs py-12">🧸 加载中...</div>
         </div>
+        
         <!-- 输入框 -->
-        <div class="flex gap-2 border-t border-[#E6C5A3]/30 pt-3">
-            <input id="msgInput" type="text" placeholder="说点什么吧..." autocomplete="off"
-                   class="flex-1 bg-[#FFF9F5] border border-[#E6C5A3]/30 rounded-2xl px-3 py-2 text-sm text-[#5F5449] outline-none focus:border-[#E6C5A3]">
-            <button onclick="sendMessage()" class="bg-[#E6C5A3] hover:bg-[#D7C5B0] text-white px-4 py-2 rounded-2xl text-sm font-medium transition-colors">发送</button>
+        <div class="relative px-3 py-3" style="border-top:1px solid rgba(230,197,163,0.25);background:rgba(255,255,255,0.5);">
+            <div class="flex gap-2">
+                <input id="msgInput" type="text" placeholder="写张小纸条..." autocomplete="off"
+                       style="flex:1;background:rgba(255,255,255,0.8);border:1px solid rgba(230,197,163,0.35);border-radius:18px;padding:0.55rem 1rem;font-size:0.85rem;color:#5F5449;outline:none;">
+                <button onclick="sendMessage()" style="background:#E6C5A3;color:#FFF;border:none;border-radius:18px;padding:0.55rem 1rem;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;">💕</button>
+            </div>
         </div>
     </div>
 

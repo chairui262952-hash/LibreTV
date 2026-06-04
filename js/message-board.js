@@ -48,17 +48,37 @@
         if (!list) return;
         const div = document.createElement('div');
         const isMe = msg.name === myName;
-        div.className = 'flex mb-3 ' + (isMe ? 'justify-end' : 'justify-start');
+        const timeStr = new Date(msg.time).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+        div.style.cssText = 'display:flex;margin-bottom:0.75rem;' + (isMe ? 'justify-content:flex-end;' : 'justify-content:flex-start;');
+        
+        // 纸张色系
+        const paperColors = ['#FFF9F0','#FFF5F5','#F5FFF5','#FFF8F0','#F8F5FF','#FFFFF5','#FFF0F5'];
+        const paperColor = paperColors[Math.floor(Math.random() * paperColors.length)];
+        
         div.innerHTML = `
-            <div class="max-w-[80%]">
-                <div class="text-xs text-[#9B8E82] mb-0.5 px-1 ${isMe ? 'text-right' : ''}">
-                    ${msg.name} · ${new Date(msg.time).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}
+            <div style="max-width:82%;${isMe ? 'text-align:right;' : ''}">
+                <div style="font-size:0.7rem;color:#B8A090;margin-bottom:0.2rem;padding:0 0.3rem;">
+                    <span style="font-weight:600;">${msg.name}</span> · ${timeStr}
                 </div>
-                <div class="px-3 py-2 rounded-2xl text-sm ${isMe ? 'bg-[#E6C5A3] text-white rounded-br-md' : 'bg-white text-[#5F5449] rounded-bl-md border border-[#E6C5A3]/30'}">
+                <div style="
+                    display:inline-block;
+                    background:${paperColor};
+                    padding:0.6rem 0.9rem;
+                    border-radius:14px;
+                    font-size:0.85rem;
+                    color:#5F5449;
+                    line-height:1.5;
+                    box-shadow:0 1px 4px rgba(180,160,140,0.1);
+                    ${isMe ? 'border-bottom-right-radius:4px;margin-right:2px;' : 'border-bottom-left-radius:4px;margin-left:2px;'}
+                    position:relative;
+                ">
                     ${msg.text.replace(/</g,'&lt;')}
                 </div>
             </div>
         `;
+        list.appendChild(div);
+        list.scrollTop = list.scrollHeight;
+    }
         list.appendChild(div);
         list.scrollTop = list.scrollHeight;
     }
