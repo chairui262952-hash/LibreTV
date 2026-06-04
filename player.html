@@ -15,6 +15,10 @@
     <script src="js/version-check.js"></script>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/player.css">
+
+    <!-- Firebase SDK（一起看功能） -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <meta http-equiv="Cache-Control" content="no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -42,6 +46,16 @@
             </button>
         </div>
         <h2 id="videoTitle" class="text-xl font-semibold flex-1 text-center overflow-x-auto whitespace-nowrap truncate custom-title-scroll"></h2>
+        <!-- 一起看按钮 + 状态 -->
+        <div id="watchTogetherBadge" class="hidden flex items-center gap-2 mr-2">
+            <button onclick="copyRoomLink()" class="px-3 py-2 bg-[#F4D8D8] hover:bg-[#E8C8C8] text-[#5F5449] rounded-2xl transition-colors flex items-center gap-1 text-sm font-medium shadow-sm">
+                💕 <span id="syncStatus">一起看</span>
+            </button>
+            <span class="text-xs text-[#9B8E82] whitespace-nowrap">房间 <b id="roomCode">--</b></span>
+        </div>
+        <button onclick="startWatchTogether()" id="watchTogetherBtn" class="px-3 py-2 bg-[#F4D8D8] hover:bg-[#E8C8C8] text-[#5F5449] rounded-2xl transition-colors flex items-center gap-1 text-sm font-medium shadow-sm mr-2">
+            💕 一起看
+        </button>
         <a href="#" id="goBack" onclick="goBack(event)" class="px-4 py-2 bg-[#FFF9F5] hover:bg-[#E6C5A3] border border-[#E6C5A3]/30 rounded-lg transition-colors flex items-center min-w-0 home-btn">
             <svg class="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
                 <path d="M5.25 11h15a1.5 1.5 0 1 1 0 3H5.25a1.5 1.5 0 0 1 0-3z"/>
@@ -245,6 +259,7 @@
     <script src="js/api.js"></script>
     <script src="js/search.js"></script>
     <script src="js/player.js"></script>
+    <script src="js/watch-together.js"></script>
 
     <script>
         // 创建全局环境变量对象
@@ -289,5 +304,9 @@
             });
         });
     </script>
+    <!-- Toast -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-white text-[#5F5449] px-6 py-3 rounded-2xl shadow-lg transform transition-all duration-300 opacity-0 -translate-y-full z-50 border border-[#E6C5A3]/30">
+        <p id="toastMessage"></p>
+    </div>
 </body>
 </html>
