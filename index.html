@@ -14,6 +14,8 @@
     <link rel="manifest" href="manifest.json">
     
     <script src="libs/tailwindcss.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/index.css">
 </head>
@@ -57,8 +59,13 @@
         </button>
     </div>
 
-    <!-- 设置按钮保留在右上角，并缩小尺寸 -->
-    <div class="fixed top-4 right-4 z-10">
+    <!-- 右上角按钮组 -->
+    <div class="fixed top-4 right-4 z-10 flex gap-2">
+        <button onclick="toggleMsgBoard(event)" class="bg-[#F4D8D8] hover:bg-[#E8C8C8] border border-[#F4D8D8] rounded-lg px-3 py-1.5 transition-colors" aria-label="留言板" title="💌 留言板">
+            <svg class="w-5 h-5" fill="none" stroke="#5F5449" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+        </button>
         <button onclick="toggleSettings(event)" class="bg-[#FFF9F5] hover:bg-[#E6C5A3] border border-[#E6C5A3]/30 hover:border-white rounded-lg px-3 py-1.5 transition-colors" aria-label="打开设置">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -207,6 +214,28 @@
                 <button onclick="exportConfig()" class="px-4 py-2 mb-2 w-full bg-gradient-to-r from-[#E6C5A3] via-[#D7C5B0] to-[#F4D8D8] hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white rounded-lg text-sm transition-all duration-300 shadow-md hover:shadow-lg">导出配置</button>
                 <button onclick="clearLocalStorage()" class="px-4 py-2 w-full bg-gradient-to-r from-[#E6C5A3] via-[#D7C5B0] to-[#F4D8D8] hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white rounded-lg text-sm transition-all duration-300 shadow-md hover:shadow-lg">清除Cookie</button>
             </div>
+        </div>
+    </div>
+
+    <!-- 留言板面板 -->
+    <div id="msgBoardPanel" class="settings-panel fixed right-0 top-0 h-full w-80 bg-white border-l border-[#E6C5A3]/30 p-5 z-40 flex flex-col" aria-label="留言板" aria-hidden="true" style="transform:translateX(100%);transition:transform 0.4s ease;">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold gradient-text">💌 小纸条</h3>
+            <button onclick="toggleMsgBoard()" class="close-btn" style="position:static;">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <!-- 消息列表 -->
+        <div id="msgList" class="flex-1 overflow-y-auto mb-3 pr-1 space-y-1" style="scrollbar-width:thin;scrollbar-color:#E6C5A3 #FFF;">
+            <div id="msgBoardLoading" class="text-center text-[#9B8E82] text-sm py-8">加载中...</div>
+        </div>
+        <!-- 输入框 -->
+        <div class="flex gap-2 border-t border-[#E6C5A3]/30 pt-3">
+            <input id="msgInput" type="text" placeholder="说点什么吧..." autocomplete="off"
+                   class="flex-1 bg-[#FFF9F5] border border-[#E6C5A3]/30 rounded-2xl px-3 py-2 text-sm text-[#5F5449] outline-none focus:border-[#E6C5A3]">
+            <button onclick="sendMessage()" class="bg-[#E6C5A3] hover:bg-[#D7C5B0] text-white px-4 py-2 rounded-2xl text-sm font-medium transition-colors">发送</button>
         </div>
     </div>
 
@@ -467,6 +496,7 @@
 
     <!-- 添加弹窗和URL搜索参数处理脚本 -->
     <script src="js/index-page.js"></script>
+    <script src="js/message-board.js"></script>
 
     <!-- 🎀 彩蛋系统 -->
     <script>
