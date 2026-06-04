@@ -41,11 +41,11 @@
     }
 
     // ========== 房主：创建房间 ==========
-    window.startWatchTogether = function() {
+    window.startWatchTogether = function(customCode) {
         if (typeof firebase === 'undefined') return alert('Firebase 加载中，请稍后再试');
         if (!app) initFirebase();
         
-        roomCode = generateRoomCode();
+        roomCode = customCode || generateRoomCode();
         isHost = true;
         roomRef = db.ref('rooms/' + roomCode);
         stateRef = roomRef.child('state');
@@ -197,15 +197,16 @@
 
     // ========== UI ==========
     function showRoomUI(code) {
-        const badge = document.getElementById('watchTogetherBadge');
-        const codeEl = document.getElementById('roomCode');
-        if (badge) badge.classList.remove('hidden');
-        if (codeEl) codeEl.textContent = code;
+        // 显示退出影厅按钮和同步状态
+        const exitBtn = document.getElementById('exitCinemaBtn');
+        const syncStatus = document.getElementById('syncStatus');
+        if (exitBtn) exitBtn.classList.remove('hidden');
+        if (syncStatus) syncStatus.classList.remove('hidden');
     }
 
     function updateRoomBadge(text) {
         const status = document.getElementById('syncStatus');
-        if (status) status.textContent = text;
+        if (status) { status.textContent = text; status.classList.remove('hidden'); }
     }
 
     // 复制房间链接

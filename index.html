@@ -253,23 +253,9 @@
                 <p class="text-gray-400 mb-6">晚上想看点什么呢？布布和一二陪你 ✨</p>
             </header>
 
-            <!-- 🏰 进入影厅 -->
-            <div id="cinemaEntry" class="text-center mb-6 hidden">
-                <div class="inline-flex items-center gap-3 bg-white/80 backdrop-blur-md border-2 border-[#E6C5A3]/40 rounded-3xl px-5 py-3 shadow-lg">
-                    <span class="text-lg">🏰</span>
-                    <input id="homeRoomInput" type="text" placeholder="输入房间号" maxlength="6" autocomplete="off"
-                           class="w-24 bg-transparent text-[#5F5449] text-lg font-bold text-center outline-none placeholder:text-[#C4B8AC] tracking-widest">
-                    <button onclick="joinCinema()" class="bg-[#E6C5A3] hover:bg-[#D7C5B0] text-white px-5 py-2 rounded-2xl text-sm font-bold transition-all hover:scale-105 shadow-md">
-                        进入影厅
-                    </button>
-                    <button onclick="toggleCinemaEntry()" class="text-[#C4B8AC] hover:text-[#5F5449] text-lg">&times;</button>
-                </div>
-                <p class="text-xs text-[#9B8E82] mt-2">输入TA给你的6位房间号，一起看 🎬</p>
-            </div>
-
-            <!-- 进入影厅按钮 -->
+            <!-- 🏰 进入影厅按钮 -->
             <div class="text-center mb-4">
-                <button onclick="toggleCinemaEntry()" id="cinemaBtn" class="px-4 py-2 bg-[#2D1F14] hover:bg-[#1A0F08] text-[#E6C5A3] rounded-2xl transition-all text-sm font-medium shadow-lg border border-[#E6C5A3]/20 inline-flex items-center gap-2">
+                <button onclick="openCinema(this)" id="cinemaBtn" class="px-5 py-3 bg-[#2D1F14] hover:bg-[#1A0F08] text-[#E6C5A3] rounded-2xl transition-all text-base font-bold shadow-lg border border-[#E6C5A3]/20 inline-flex items-center gap-2">
                     🏰 进入影厅
                 </button>
             </div>
@@ -519,62 +505,7 @@
     <!-- 添加弹窗和URL搜索参数处理脚本 -->
     <script src="js/index-page.js"></script>
     <script src="js/message-board.js"></script>
-
-    <!-- 🏰 影院模式 -->
-    <script>
-    // Firebase 初始化
-    function initCinemaFirebase(cb) {
-        if (typeof firebase !== 'undefined' && firebase.database) {
-            if (!firebase.apps.length) {
-                firebase.initializeApp({
-                    apiKey: "AIzaSyDucrfUBjACFOl19wn_hn_37LVG13f6AL4",
-                    authDomain: "xiaobentv.firebaseapp.com",
-                    databaseURL: "https://xiaobentv-default-rtdb.asia-southeast1.firebasedatabase.app",
-                    projectId: "xiaobentv"
-                });
-            }
-            cb(firebase.database());
-        } else {
-            setTimeout(() => initCinemaFirebase(cb), 300);
-        }
-    }
-
-    window.toggleCinemaEntry = function() {
-        document.getElementById('cinemaEntry')?.classList.toggle('hidden');
-        document.getElementById('cinemaBtn')?.classList.toggle('hidden');
-        if (!document.getElementById('cinemaEntry')?.classList.contains('hidden')) {
-            setTimeout(() => document.getElementById('homeRoomInput')?.focus(), 200);
-        }
-    };
-
-    window.joinCinema = function() {
-        const code = document.getElementById('homeRoomInput')?.value.trim();
-        if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
-            alert('请输入正确的6位房间号～');
-            return;
-        }
-        const btn = document.querySelector('#cinemaEntry button');
-        if (btn) { btn.textContent = '连接中...'; btn.disabled = true; }
-
-        initCinemaFirebase(function(db) {
-            db.ref('rooms/' + code).once('value').then(function(snap) {
-                const room = snap.val();
-                if (!room || !room.video || !room.video.url) {
-                    alert('这个房间不存在或房主还没开始播放～');
-                    if (btn) { btn.textContent = '进入影厅'; btn.disabled = false; }
-                    return;
-                }
-                // 跳转到播放页
-                const v = room.video;
-                const watchUrl = `watch.html?id=${encodeURIComponent(v.id||'')}&source=${encodeURIComponent(v.source||'')}&url=${encodeURIComponent(v.url)}&title=${encodeURIComponent(v.title||'')}&room=${code}`;
-                window.location.href = watchUrl;
-            }).catch(function() {
-                alert('连接失败，请检查房间号～');
-                if (btn) { btn.textContent = '进入影厅'; btn.disabled = false; }
-            });
-        });
-    };
-    </script>
+    <script src="js/cinema-mode.js"></script>
 
     <!-- 🎀 彩蛋系统 -->
     <script>
