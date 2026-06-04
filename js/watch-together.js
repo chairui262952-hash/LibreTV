@@ -85,10 +85,16 @@
     function enableCinemaMode() {
         document.body.classList.add('cinema-mode');
         const curtain = document.createElement('div');
-        curtain.className = 'cinema-curtain';
-        curtain.innerHTML = '<div class="curtain-text">🏰 正在进入影厅...</div>';
+        curtain.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a0a;display:flex;align-items:center;justify-content:center;';
+        curtain.innerHTML = '<div style="font-size:1.5rem;color:#E6C5A3;opacity:0;">🏰 正在进入影厅...</div>';
         document.body.appendChild(curtain);
-        setTimeout(() => { if (curtain.parentNode) curtain.remove(); }, 2000);
+        if (typeof anime !== 'undefined') {
+            anime({ targets: curtain.firstElementChild, opacity: [0, 1], duration: 600, easing: 'easeInOutQuad' });
+            anime({ targets: curtain, opacity: [1, 0], duration: 800, delay: 1200, easing: 'easeInOutQuad', complete: function() { if (curtain.parentNode) curtain.remove(); } });
+        } else {
+            setTimeout(() => { curtain.firstElementChild.style.opacity = '1'; }, 100);
+            setTimeout(() => { if (curtain.parentNode) curtain.remove(); }, 2000);
+        }
     }
 
     // ========== 客端：加入房间 ==========

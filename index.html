@@ -14,6 +14,7 @@
     <link rel="manifest" href="manifest.json">
     
     <script src="libs/tailwindcss.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@4.0.0/lib/anime.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="css/styles.css">
@@ -676,19 +677,21 @@
                     toast.style.opacity = '1';
                     setTimeout(() => { toast.style.opacity = '0'; }, 2000);
                 }
-                // 爱心雨
-                for (let i = 0; i < 8; i++) {
+                // 爱心雨 (anime.js)
+                const emojis = ['❤️','💕','💖','💗','🩷','🧸','✨','🌸'];
+                for (let i = 0; i < 10; i++) {
                     const heart = document.createElement('span');
-                    heart.textContent = ['❤️','💕','💖','💗','🩷','🧸','✨','🌸'][i];
-                    heart.style.cssText = `
-                        position:fixed; z-index:9999; pointer-events:none;
-                        font-size:${16+Math.random()*20}px;
-                        left:${e.clientX-15+Math.random()*30}px;
-                        top:${e.clientY}px;
-                        animation: heartFall ${1+Math.random()*1.5}s ease-out forwards;
-                    `;
+                    heart.textContent = emojis[i % emojis.length];
+                    heart.style.cssText = `position:fixed;z-index:9999;pointer-events:none;left:${e.clientX}px;top:${e.clientY}px;font-size:20px;opacity:1;`;
                     document.body.appendChild(heart);
-                    setTimeout(() => heart.remove(), 2500);
+                    if (typeof anime !== 'undefined') {
+                        anime({ targets: heart, translateX: anime.random(-60,60), translateY: -anime.random(80,180), rotate: anime.random(-40,40), scale: [1, anime.random(0.2,1.2)], opacity: [1,0], duration: anime.random(1200,2000), easing: 'easeOutExpo', complete: function() { heart.remove(); } });
+                    } else {
+                        // fallback
+                        heart.style.transition = 'all 1.5s ease-out';
+                        setTimeout(() => { heart.style.opacity = '0'; heart.style.transform = `translate(${Math.random()*60-30}px, -120px) rotate(${Math.random()*40-20}deg) scale(0.3)`; }, 10);
+                        setTimeout(() => heart.remove(), 1600);
+                    }
                 }
                 // 第10次点击彩蛋
                 if (heartCount === 10) {
@@ -718,30 +721,21 @@
                     logoClicks = 0;
                     const heart = document.createElement('div');
                     heart.innerHTML = '🐻💕一二';
-                    heart.style.cssText = `
-                        position:fixed; top:50%; left:50%; z-index:99999;
-                        transform:translate(-50%,-50%) scale(0);
-                        font-size:60px; pointer-events:none;
-                        animation: logoBoom 2s ease-out forwards;
-                    `;
+                    heart.style.cssText = 'position:fixed;top:50%;left:50%;z-index:99999;font-size:60px;pointer-events:none;transform:translate(-50%,-50%) scale(0);';
                     document.body.appendChild(heart);
-                    setTimeout(() => heart.remove(), 2500);
+                    if (typeof anime !== 'undefined') {
+                        anime({ targets: heart, scale: [0, 2.5, 3], rotate: [0, 180, 360], opacity: [1, 0.8, 0], duration: 2000, easing: 'easeOutElastic(1, .6)', complete: function() { heart.remove(); } });
+                    } else {
+                        heart.style.transition = 'all 2s ease-out';
+                        setTimeout(() => { heart.style.transform = 'translate(-50%,-50%) scale(3) rotate(360deg)'; heart.style.opacity = '0'; }, 10);
+                        setTimeout(() => heart.remove(), 2100);
+                    }
                 }
             });
         }
     })();
     </script>
 
-    <style>
-    @keyframes heartFall {
-        0% { opacity:1; transform:translateY(0) rotate(0deg) scale(1); }
-        100% { opacity:0; transform:translateY(-120px) rotate(30deg) scale(0.3); }
-    }
-    @keyframes logoBoom {
-        0% { transform:translate(-50%,-50%) scale(0) rotate(0deg); opacity:1; }
-        50% { transform:translate(-50%,-50%) scale(2) rotate(180deg); opacity:0.8; }
-        100% { transform:translate(-50%,-50%) scale(3) rotate(360deg); opacity:0; }
-    }
-    </style>
+
 </body>
 </html>
