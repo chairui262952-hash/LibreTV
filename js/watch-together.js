@@ -52,9 +52,17 @@
         hostRef = roomRef.child('host');
 
         // 初始化房间
+        // 获取当前视频信息
+        const params = new URLSearchParams(window.location.search);
+        const videoUrl = params.get('url') || '';
+        const videoTitle = decodeURIComponent(params.get('title') || localStorage.getItem('currentVideoTitle') || '');
+        const source = params.get('source') || '';
+        const vodId = params.get('id') || '';
+        
         roomRef.set({
             host: { online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP },
-            state: { playing: false, currentTime: 0, timestamp: Date.now() }
+            state: { playing: false, currentTime: 0, timestamp: Date.now() },
+            video: { url: videoUrl, title: videoTitle, source: source, id: vodId }
         });
 
         // 房主离开时清理
@@ -73,11 +81,22 @@
         updateRoomBadge('房主 · 同步中');
     };
 
+    // 影院模式
+    function enableCinemaMode() {
+        document.body.classList.add('cinema-mode');
+        const curtain = document.createElement('div');
+        curtain.className = 'cinema-curtain';
+        curtain.innerHTML = '<div class="curtain-text">🏰 正在进入影厅...</div>';
+        document.body.appendChild(curtain);
+        setTimeout(() => { if (curtain.parentNode) curtain.remove(); }, 2000);
+    }
+
     // ========== 客端：加入房间 ==========
     window.joinWatchTogether = function(code) {
         if (typeof firebase === 'undefined') return alert('Firebase 加载中，请稍后再试');
         if (!app) initFirebase();
         
+        enableCinemaMode();
         roomCode = code;
         isGuest = true;
         roomRef = db.ref('rooms/' + code);
