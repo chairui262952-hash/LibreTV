@@ -26,7 +26,6 @@
         db = firebase.database();
         msgRef = db.ref('messages');
         
-        // 确定身份：URL 参数或 localStorage
         const params = new URLSearchParams(window.location.search);
         myName = params.get('me') || localStorage.getItem('msgBoardName') || '';
         if (!myName) {
@@ -34,53 +33,62 @@
             localStorage.setItem('msgBoardName', myName);
         }
         
-        // 监听消息
         msgRef.limitToLast(50).on('child_added', function(snap) {
             renderMessage(snap.val());
         });
 
-        // 已加载
         document.getElementById('msgBoardLoading')?.classList.add('hidden');
     }
 
     function renderMessage(msg) {
         const list = document.getElementById('msgList');
         if (!list) return;
+        
+        // 隐藏空状态
+        const loading = document.getElementById('msgBoardLoading');
+        if (loading) loading.style.display = 'none';
+
         const div = document.createElement('div');
-        const isMe = msg.name === myName;
         const timeStr = new Date(msg.time).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
-        div.style.cssText = 'display:flex;margin-bottom:0.75rem;' + (isMe ? 'justify-content:flex-end;' : 'justify-content:flex-start;');
         
-        // 纸张色系
-        const paperColors = ['#FFF9F0','#FFF5F5','#F5FFF5','#FFF8F0','#F8F5FF','#FFFFF5','#FFF0F5'];
-        const paperColor = paperColors[Math.floor(Math.random() * paperColors.length)];
+        // 随机便签纸颜色 + 随机微旋转
+        const colors = ['#FFF9F0','#FFF5F5','#F5FFF5','#FFF8F0','#F8F5FF','#FFFFF5','#FFF0F5','#FFF5F0','#F0FFF5'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const rotate = (Math.random() - 0.5) * 4; // -2° ~ 2°
         
-        div.innerHTML = `
-            <div style="max-width:82%;${isMe ? 'text-align:right;' : ''}">
-                <div style="font-size:0.7rem;color:#B8A090;margin-bottom:0.2rem;padding:0 0.3rem;">
-                    <span style="font-weight:600;">${msg.name}</span> · ${timeStr}
-                </div>
-                <div style="
-                    display:inline-block;
-                    background:${paperColor};
-                    padding:0.6rem 0.9rem;
-                    border-radius:14px;
-                    font-size:0.85rem;
-                    color:#5F5449;
-                    line-height:1.5;
-                    box-shadow:0 1px 4px rgba(180,160,140,0.1);
-                    ${isMe ? 'border-bottom-right-radius:4px;margin-right:2px;' : 'border-bottom-left-radius:4px;margin-left:2px;'}
-                    position:relative;
-                ">
-                    ${msg.text.replace(/</g,'&lt;')}
-                </div>
-            </div>
+        div.style.cssText = `
+            background:${color};
+            padding:0.5rem 0.8rem;
+            border-radius:14px;
+            font-size:0.8rem;
+            color:#5F5449;
+            box-shadow:0 2px 8px rgba(180,160,140,0.12);
+            transform:rotate(${rotate}deg);
+            display:inline-block;
+            max-width:220px;
+            word-break:break-word;
+            position:relative;
+            transition:transform 0.2s;
+            cursor:default;
+            flex-shrink:0;
         `;
+        div.title = `${msg.name} · ${timeStr}`;
+        div.innerHTML = `
+            <span style="font-size:0.65rem;color:#B8A090;display:block;margin-bottom:0.15rem;font-weight:600;">${msg.name}</span>
+            ${msg.text.replace(/</g,'&lt;')}
+            <span style="font-size:0.6rem;color:#C4B8AC;display:block;margin-top:0.2rem;">${timeStr}</span>
+        `;
+        
+        div.addEventListener('mouseenter', function() {
+            this.style.transform = `rotate(0deg) scale(1.05)`;
+            this.style.zIndex = '5';
+        });
+        div.addEventListener('mouseleave', function() {
+            this.style.transform = `rotate(${rotate}deg) scale(1)`;
+            this.style.zIndex = '';
+        });
+        
         list.appendChild(div);
-        list.scrollTop = list.scrollHeight;
-    }
-        list.appendChild(div);
-        list.scrollTop = list.scrollHeight;
     }
 
     window.sendMessage = function() {
@@ -95,13 +103,17 @@
         input.value = '';
     };
 
-    window.toggleMsgBoard = function(e) {
-        const panel = document.getElementById('msgBoardPanel');
-        panel?.classList.toggle('show');
-        if (e) { e.preventDefault(); e.stopPropagation(); }
+    window.scrollToMsgBoard = function() {
+        const wall = document.getElementById('msgWall');
+        if (wall) {
+            wall.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // 闪烁效果
+            wall.style.transition = 'all 0.3s';
+            wall.style.boxShadow = '0 0 0 4px rgba(230,197,163,0.4)';
+            setTimeout(() => { wall.style.boxShadow = ''; }, 1500);
+        }
     };
 
-    // 回车发送
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && document.activeElement?.id === 'msgInput') {
             sendMessage();
