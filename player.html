@@ -56,6 +56,17 @@
         <button onclick="startWatchTogether()" id="watchTogetherBtn" class="px-3 py-2 bg-[#F4D8D8] hover:bg-[#E8C8C8] text-[#5F5449] rounded-2xl transition-colors flex items-center gap-1 text-sm font-medium shadow-sm mr-2">
             💕 一起看
         </button>
+        <!-- 加入房间 -->
+        <div class="flex items-center gap-1 mr-2">
+            <button onclick="toggleJoinRoom()" id="joinRoomBtn" class="px-2 py-2 bg-[#FFF9F5] hover:bg-[#E6C5A3] border border-[#E6C5A3]/30 text-[#5F5449] rounded-2xl transition-colors text-sm flex items-center gap-1" title="加入房间">
+                🔗
+            </button>
+            <div id="joinRoomInput" class="hidden flex items-center gap-1">
+                <input id="roomCodeInput" type="text" placeholder="6位房间号" maxlength="6" autocomplete="off"
+                       class="w-20 bg-white border border-[#E6C5A3]/30 rounded-xl px-2 py-1.5 text-sm text-[#5F5449] outline-none focus:border-[#E6C5A3]">
+                <button onclick="joinRoom()" class="bg-[#E6C5A3] hover:bg-[#D7C5B0] text-white px-3 py-1.5 rounded-xl text-sm font-medium transition-colors">加入</button>
+            </div>
+        </div>
         <a href="#" id="goBack" onclick="goBack(event)" class="px-4 py-2 bg-[#FFF9F5] hover:bg-[#E6C5A3] border border-[#E6C5A3]/30 rounded-lg transition-colors flex items-center min-w-0 home-btn">
             <svg class="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
                 <path d="M5.25 11h15a1.5 1.5 0 1 1 0 3H5.25a1.5 1.5 0 0 1 0-3z"/>

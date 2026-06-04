@@ -214,6 +214,28 @@
         document.head.appendChild(style);
     }
 
+    // 手动加入房间
+    window.toggleJoinRoom = function() {
+        const div = document.getElementById('joinRoomInput');
+        const input = document.getElementById('roomCodeInput');
+        div?.classList.toggle('hidden');
+        if (!div?.classList.contains('hidden')) {
+            setTimeout(() => input?.focus(), 100);
+        }
+    };
+
+    window.joinRoom = function() {
+        const code = document.getElementById('roomCodeInput')?.value.trim();
+        if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+            alert('请输入正确的6位房间号');
+            return;
+        }
+        document.getElementById('joinRoomInput')?.classList.add('hidden');
+        document.getElementById('watchTogetherBtn')?.classList.add('hidden');
+        window.joinWatchTogether(code);
+        lockGuestControls();
+    };
+
     // 页面加载时检查是否有 room 参数
     waitForFirebase(function() {
         if (!app) initFirebase();
